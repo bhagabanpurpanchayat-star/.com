@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bhagabanpur Gram Panchayat | Malda</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --primary: #001f3f;
+  --secondary: #0074D9;
+  --light: #f8f9fa;
+  --text: #333;
+}
+
+/* General */
+* { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background: var(--light); color: var(--text); }
+
+/* Header */
+header {
+  background: var(--primary);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.header-container {
+  max-width: 1600px;
+  margin: auto;
+  padding: 0.3rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo + Home */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: 1.3rem;
+  color: var(--secondary);
+  cursor: pointer;
+}
+
+.logo h1 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+/* Navigation */
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 5px;
+}
+
+nav li { position: relative; }
+
+/* 3D Nav Buttons */
+nav > ul > li > a {
+  text-decoration: none;
+  color: white;
+  padding: 8px 18px;
+  min-width: 140px;
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  background: linear-gradient(145deg, var(--primary), var(--secondary));
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.2);
+  transition: all 0.25s ease;
+  text-align: center;
+  cursor: pointer;
+}
+
+nav > ul > li > a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset 0 2px 6px rgba(255,255,255,0.3);
+  background: linear-gradient(145deg, var(--secondary), var(--primary));
+}
+
+/* Dropdown */
+.submenu {
+  list-style: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: var(--primary);
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  display: none;
+  flex-direction: column;
+  z-index: 999;
+}
+
+.submenu li a {
+  padding: 6px 12px;
+  display: block;
+  text-decoration: none;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: linear-gradient(145deg, var(--primary), var(--secondary));
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 2px 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2);
+}
+
+.submenu li a:hover {
+  background: var(--secondary);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.3);
+}
+
+nav li:hover > .submenu { display: flex; animation: fadeIn 0.25s ease; }
+.submenu .submenu { top:0; left:100%; margin-left:2px; border-radius:3px; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Arrow indicators */
+.has-submenu::after { content: " ▼"; font-size: 0.7rem; }
+.has-submenu-right::after { content: " ▶"; font-size: 0.7rem; }
+
+/* Iframe Section */
+.iframe-container {
+  width: 100%;
+  height: calc(100vh - 70px);
+  margin-top: 10px;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
+}
+
+/* Footer */
+footer {
+  background: var(--primary);
+  color: white;
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  margin-top: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-container">
+    <div class="logo">
+      <i class="fas fa-home" onclick="loadPage('home1')"></i>
+      <h1>Bhagabanpur Gram Panchayat</h1>
+    </div>
+    <nav>
+      <ul>
+        <li>
+          <a class="has-submenu">Profile</a>
+          <ul class="submenu">
+            <li><a onclick="loadPage('basicdetails')">Basic Details</a></li>
+            <li><a onclick="loadPage('sansad')">Sansad</a></li>
+            <li><a onclick="loadPage('villages')">Villages</a></li>
+            <li><a onclick="loadPage('mouja')">Mouja</a></li>
+            <li><a onclick="loadPage('school')">School</a></li>
+            <li><a onclick="loadPage('polling')">Polling Stations</a></li>
+            <li><a onclick="loadPage('clubs')">Clubs</a></li>
+            <li><a onclick="loadPage('playgrounds')">Play Grounds</a></li>
+            <li><a onclick="loadPage('waterbodies')">Waterbodies</a></li>
+          </ul>
+        </li>
+        <li>
+          <a class="has-submenu">PRI Details</a>
+          <ul class="submenu">
+            <li><a onclick="loadPage('gp_member')">Gram Panchayat Member</a></li>
+            <li><a onclick="loadPage('ps_member')">Panchayat Samity Member</a></li>
+            <li>
+              <a class="has-submenu-right">Upasamity</a>
+              <ul class="submenu">
+                <li><a onclick="loadPage('krishi')">কৃষি ও প্রানি সম্পদ বিকাশ</a></li>
+                <li><a onclick="loadPage('shilpa')">শিল্প ও পরিকাঠামো উপসমিতি</a></li>
+                <li><a onclick="loadPage('nari')">নারী শিশু উন্নয়ন ও সমাজ কল্যাণ উপসমিতি</a></li>
+                <li><a onclick="loadPage('shiksha')">শিক্ষা ও জন স্বাস্থ্য উপসমিতি</a></li>
+                <li><a onclick="loadPage('arthik')">অর্থ ও পরিকল্পনা উপসমিতি</a></li>
+              </ul>
+            </li>
+            <li><a onclick="loadPage('staffs')">Gram Panchayat Staffs</a></li>
+            <li><a onclick="loadPage('vrp')">VRP</a></li>
+            <li><a onclick="loadPage('cf')">CF</a></li>
+            <li><a onclick="loadPage('nregs')">NREGS Supervisor</a></li>
+          </ul>
+        </li>
+        <li>
+          <a class="has-submenu">Funds</a>
+          <ul class="submenu">
+            <li><a onclick="loadPage('15fc')">15th FC</a></li>
+            <li><a onclick="loadPage('beup')">BEUP</a></li>
+            <li><a onclick="loadPage('vwsc')">VWSC</a></li>
+            <li><a onclick="loadPage('mgnregs')">MGNREGS</a></li>
+            <li><a onclick="loadPage('mplad')">MPLAD</a></li>
+            <li><a onclick="loadPage('ibrd')">IBRD</a></li>
+            <li><a onclick="loadPage('5sfc')">5th SFC</a></li>
+          </ul>
+        </li>
+        <li>
+          <a class="has-submenu">Our Services</a>
+          <ul class="submenu">
+            <li><a onclick="loadPage('deathbirth')">Death & Birth Registration</a></li>
+            <li><a onclick="loadPage('certificates')">Various Certificates</a></li>
+            <li><a onclick="loadPage('chcmi')">CHCMI</a></li>
+            <li><a onclick="loadPage('laxmirbhandar')">Laxmir Bhandar</a></li>
+            <li><a onclick="loadPage('jaijohar')">Jai Johar</a></li>
+          </ul>
+        </li>
+        <li>
+          <a class="has-submenu">Forms</a>
+          <ul class="submenu">
+            <li><a onclick="loadPage('samabyathi')">Samabyathi</a></li>
+            <li><a onclick="loadPage('income')">Income</a></li>
+            <li><a onclick="loadPage('domicile')">Domicile</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- Iframe Content Area -->
+<div class="iframe-container">
+  <iframe id="frameContent" src="home1.htm"></iframe>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>&copy; 2025 Bhagabanpur Gram Panchayat | Designed for Public Service</p>
+</footer>
+
+<script>
+function loadPage(page) {
+  document.getElementById("frameContent").src = page + ".htm";
+}
+</script>
+
+</body>
+</html>
