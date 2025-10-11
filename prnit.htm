@@ -62,12 +62,13 @@
       overflow-x: auto;
     }
 
-    /* Center all text in tender table */
+    /* Center all text in the tender table */
     #form-container table.tender-table th,
     #form-container table.tender-table td {
       text-align: center;
       vertical-align: middle;
     }
+
   </style>
 </head>
 <body>
@@ -86,7 +87,7 @@
   <div id="form-container"></div>
 
   <script>
-    const baseUrl = "https://script.google.com/macros/s/AKfycbwPSaKPCEZlC3dJoNvkkhIpf59Ud3GT53mJp_zHKiIb1T22VuZx9UrFdx-qSLXbNULbng/exec"; // Replace with your Apps Script Web App URL
+    const baseUrl = "https://script.google.com/macros/s/AKfycbwPSaKPCEZlC3dJoNvkkhIpf59Ud3GT53mJp_zHKiIb1T22VuZx9UrFdx-qSLXbNULbng/exec"; // Replace with your Web App URL
 
     const nitSelect = document.getElementById("nitSelect");
     const previewBtn = document.getElementById("previewBtn");
@@ -135,7 +136,7 @@
       }
     });
 
-    // Print with A4 layout
+    // Print
     printBtn.addEventListener("click", () => {
       if (!container.innerHTML.trim()) { alert("No preview to print."); return; }
 
@@ -148,15 +149,7 @@
 
       const doc = iframe.contentDocument || iframe.contentWindow.document;
       doc.open();
-      doc.write('<html><head><title>Print</title><style>');
-      doc.write(`
-        body { margin: 0; font-family: 'Times New Roman', Times, serif; }
-        table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
-        th, td { border: 1px solid #000; text-align: center; vertical-align: middle; }
-        tr { page-break-inside: avoid; page-break-after: auto; }
-        @page { size: A4; margin: 10mm; }
-      `);
-      doc.write('</style></head><body>');
+      doc.write('<html><head><title>Print</title></head><body>');
       doc.write(container.innerHTML);
       doc.write('</body></html>');
       doc.close();
