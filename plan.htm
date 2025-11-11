@@ -88,8 +88,6 @@
         width: 100%;
         border-collapse: collapse;
         background: white;
-        border-radius: 10px;
-        overflow: hidden;
     }
 
     thead {
@@ -142,6 +140,23 @@
     @keyframes spin {
         100% { transform: rotate(360deg); }
     }
+
+    /* ✅ RESPONSIVE SCROLL ONLY WHEN NEEDED */
+    .table-wrapper {
+        max-height: calc(100vh - 320px);
+        overflow-y: auto;
+        overflow-x: auto;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+    }
+
+    /* ✅ Frozen Header */
+    #dataTable thead th {
+        position: sticky;
+        top: 0;
+        background: #1e3c72;
+        z-index: 10;
+    }
 </style>
 </head>
 
@@ -181,24 +196,26 @@
         <button id="exportBtn">⬇ Export Excel</button>
     </div>
 
-    <table id="dataTable">
-        <thead>
-            <tr>
-                <th>S.No</th>
-                <th>Financial Year</th>
-                <th>PLAN TYPE</th>
-                <th>Activity Code</th>
-                <th>Activity Description</th>
-                <th>Sector</th>
-                <th>Location of Asset</th>
-                <th>Estimated Cost</th>
-                <th>Scheme Name</th>
-                <th>Theme Name</th>
-                <th>Tender Status</th>
-            </tr>
-        </thead>
-        <tbody id="dataBody"></tbody>
-    </table>
+    <div class="table-wrapper">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Financial Year</th>
+                    <th>PLAN TYPE</th>
+                    <th>Activity Code</th>
+                    <th>Activity Description</th>
+                    <th>Sector</th>
+                    <th>Location of Asset</th>
+                    <th>Estimated Cost</th>
+                    <th>Scheme Name</th>
+                    <th>Theme Name</th>
+                    <th>Tender Status</th>
+                </tr>
+            </thead>
+            <tbody id="dataBody"></tbody>
+        </table>
+    </div>
 
 </div>
 
@@ -286,7 +303,6 @@ function renderTable(data) {
     });
 }
 
-/* ✅ FIXED UPLOAD WITH LOADER + SAFE JSON */
 async function uploadExcel() {
     let f = document.getElementById("excelFile").files[0];
     if (!f) return alert("Please select a file.");
@@ -306,10 +322,7 @@ async function uploadExcel() {
 
     let output = await res.json();
 
-    let added = output.added ?? output.result?.added ?? "0";
-    let skipped = output.skipped ?? output.result?.skipped ?? "0";
-
-    alert(`Imported: ${added} rows\nSkipped: ${skipped}`);
+    alert(`Imported: ${output.added ?? "0"} rows\nSkipped: ${output.skipped ?? "0"}`);
 
     loadData();
 }
