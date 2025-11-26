@@ -61,6 +61,7 @@
     .btn-save { background: green; }
     .btn-update { background: orange; }
     .btn-bulk { background: #6f42c1; }
+    .btn-export { background: #17a2b8; }
 
     /* Extraction Progress Popup */
     #progressPopup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
@@ -301,6 +302,7 @@
     <div style="display:flex; gap:8px;">
       <button id="refreshBtn" onclick="refreshData()">⟳ Refresh</button>
       <button id="clearSearchBtn" onclick="clearSearch()">✖ Clear</button>
+      <button id="exportBtn" class="btn-export action-btn" onclick="exportToExcel()">Export to Excel</button>
       <button id="bulkAssignBtn" class="btn-bulk action-btn" onclick="openBulkVendorModal()">Bulk Vendor Assignment</button>
     </div>
   </div>
@@ -459,6 +461,7 @@
     const scriptURL = "https://script.google.com/macros/s/AKfycbzlNPknY-dsU5wjAQNuxQlN71yM-3VlaRRspR8BUCS3ZwkhDIAnD4qt8QovHWNkLhs8/exec";
 
     let tableData = [];      // full table rows from server
+    let filteredData = [];   // currently displayed (filtered) data
     let vendorOptions = [];  // list of all vendors from server
     let uniqueNITs = [];     // list of unique NIT numbers
 
@@ -490,8 +493,9 @@
       const [vRes, tRes] = await Promise.all([fetch(scriptURL + "?action=getVendors"), fetch(scriptURL + "?action=getTenderData")]);
       vendorOptions = await vRes.json();
       tableData = await tRes.json();
-      renderTable(tableData);
-      updateStamp(tableData);
+      filteredData = [...tableData]; // Initialize filteredData with all data
+      renderTable(filteredData);
+      updateStamp(filteredData);
       populateNITDropdown();
     }
 
@@ -509,23 +513,23 @@
       const tbody = document.querySelector("#dataTable tbody");
       tbody.innerHTML = "";
 
-      data.forEach((row, idx) => {
+      data.forEach((filteredRow, filteredIndex) => {
         const tr = document.createElement("tr");
 
-        const timeStamp = formatTimestamp(row[0]);
-        const finYear = valueToString(row[1]);
-        const nitNo = valueToString(row[4]);
-        const nitDate = formatDate(row[5]);
-        const slNo = valueToString(row[6]);
-        const uniqueNIT = valueToString(row[7]);
-        const activityId = valueToString(row[8]);
-        const workName = valueToString(row[9]);
-        const siteDetails = valueToString(row[10]);
-        const fund = valueToString(row[11]);
-        const tenderAmt = valueToString(row[12]);
-        const formPrice = valueToString(row[13]);
-        const earnest = valueToString(row[14]);
-        const vendorsArr = valueToString(row[15]).split(",").map(s => s.trim()).filter(s => s);
+        const timeStamp = formatTimestamp(filteredRow[0]);
+        const finYear = valueToString(filteredRow[1]);
+        const nitNo = valueToString(filteredRow[4]);
+        const nitDate = formatDate(filteredRow[5]);
+        const slNo = valueToString(filteredRow[6]);
+        const uniqueNIT = valueToString(filteredRow[7]);
+        const activityId = valueToString(filteredRow[8]);
+        const workName = valueToString(filteredRow[9]);
+        const siteDetails = valueToString(filteredRow[10]);
+        const fund = valueToString(filteredRow[11]);
+        const tenderAmt = valueToString(filteredRow[12]);
+        const formPrice = valueToString(filteredRow[13]);
+        const earnest = valueToString(filteredRow[14]);
+        const vendorsArr = valueToString(filteredRow[15]).split(",").map(s => s.trim()).filter(s => s);
 
         // basic cells
         [timeStamp, finYear, uniqueNIT, nitNo, nitDate, slNo, activityId, workName, siteDetails, fund, tenderAmt, formPrice, earnest].forEach(val => {
@@ -576,15 +580,160 @@
           btnAction.classList.add("btn-update");
         }
 
+        // Store the original row index from tableData
+        const originalRowIndex = tableData.findIndex(row => 
+          valueToString(row[7]) === uniqueNIT && 
+          valueToString(row[6]) === slNo
+        );
+
         // clicking either vendor cell or action button opens modal
-        tdVendor.onclick = () => openVendorModal(idx, tdVendor, btnAction, vendorsArr);
-        btnAction.onclick = () => openVendorModal(idx, tdVendor, btnAction, vendorsArr);
+        tdVendor.onclick = () => openVendorModal(originalRowIndex, tdVendor, btnAction, vendorsArr);
+        btnAction.onclick = () => openVendorModal(originalRowIndex, tdVendor, btnAction, vendorsArr);
 
         tdAction.appendChild(btnAction);
         tr.appendChild(tdAction);
 
         tbody.appendChild(tr);
       });
+    }
+
+    // --- Excel Export Function ---
+    function exportToExcel() {
+      showPopup("Preparing Excel export...", true);
+      
+      try {
+        // Use filteredData instead of tableData for export
+        const dataToExport = filteredData.length > 0 ? filteredData : tableData;
+        
+        // Create a workbook
+        const wb = XLSX.utils.book_new();
+        wb.Props = {
+          Title: "Sale of Tender Form Data",
+          Subject: "Vendor Assignment Data",
+          Author: "Tender Management System",
+          CreatedDate: new Date()
+        };
+
+        // Prepare data for export
+        const exportData = dataToExport.map(row => {
+          const timeStamp = formatTimestamp(row[0]);
+          const finYear = valueToString(row[1]);
+          const uniqueNIT = valueToString(row[7]);
+          const nitNo = valueToString(row[4]);
+          const nitDate = formatDate(row[5]);
+          const slNo = valueToString(row[6]);
+          const activityId = valueToString(row[8]);
+          const workName = valueToString(row[9]);
+          const siteDetails = valueToString(row[10]);
+          const fund = valueToString(row[11]);
+          const tenderAmt = valueToString(row[12]);
+          const formPrice = valueToString(row[13]);
+          const earnest = valueToString(row[14]);
+          const vendors = valueToString(row[15]);
+
+          return {
+            "Timestamp": timeStamp,
+            "Financial Year": finYear,
+            "UNIQUE NIT": uniqueNIT,
+            "NIT No": nitNo,
+            "Date": nitDate,
+            "Sl No": slNo,
+            "Activity ID": activityId,
+            "Name of the work": workName,
+            "Site details": siteDetails,
+            "Source of Fund": fund,
+            "Tendered Amount (In Rs.)": tenderAmt,
+            "Tender Form Price": formPrice,
+            "Earnest Money": earnest,
+            "Vendors": vendors
+          };
+        });
+
+        // Create worksheet
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        
+        // Get the range of the worksheet
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        
+        // Apply dotted border style to all cells using cell styles
+        for(let R = range.s.r; R <= range.e.r; ++R) {
+          for(let C = range.s.c; C <= range.e.c; ++C) {
+            const cell_address = {c:C, r:R};
+            const cell_ref = XLSX.utils.encode_cell(cell_address);
+            
+            if(!ws[cell_ref]) continue;
+            
+            // Initialize style object if it doesn't exist
+            if(!ws[cell_ref].s) ws[cell_ref].s = {};
+            
+            // Apply border style - using 'dashed' as 'dotted' might not be supported
+            ws[cell_ref].s.border = {
+              top: { style: 'dashed', color: { rgb: '000000' } },
+              left: { style: 'dashed', color: { rgb: '000000' } },
+              bottom: { style: 'dashed', color: { rgb: '000000' } },
+              right: { style: 'dashed', color: { rgb: '000000' } }
+            };
+            
+            // Apply basic styling
+            ws[cell_ref].s.font = { name: 'Arial', sz: 10 };
+            ws[cell_ref].s.alignment = { vertical: 'center', horizontal: 'left' };
+          }
+        }
+
+        // Style header row with solid borders for better visibility
+        if(range.s.r === 0) {
+          for(let C = range.s.c; C <= range.e.c; ++C) {
+            const cell_address = {c:C, r:0};
+            const cell_ref = XLSX.utils.encode_cell(cell_address);
+            
+            if(!ws[cell_ref]) continue;
+            
+            if(!ws[cell_ref].s) ws[cell_ref].s = {};
+            ws[cell_ref].s.font = { name: 'Arial', sz: 11, bold: true, color: { rgb: 'FFFFFF' } };
+            ws[cell_ref].s.fill = { fgColor: { rgb: '003366' } };
+            ws[cell_ref].s.border = {
+              top: { style: 'thin', color: { rgb: '000000' } },
+              left: { style: 'thin', color: { rgb: '000000' } },
+              bottom: { style: 'thin', color: { rgb: '000000' } },
+              right: { style: 'thin', color: { rgb: '000000' } }
+            };
+            ws[cell_ref].s.alignment = { vertical: 'center', horizontal: 'center' };
+          }
+        }
+
+        // Alternative approach: Set border for the entire range
+        ws['!cols'] = [];
+        for(let i = 0; i <= range.e.c; i++) {
+          ws['!cols'].push({ width: 15 });
+        }
+
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(wb, ws, "Tender Data");
+
+        // Generate file and download
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([wbout], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        
+        // Create filename with timestamp and row count
+        const rowCount = dataToExport.length;
+        const timestamp = new Date().toISOString().slice(0,10).replace(/-/g, '');
+        a.download = `Tender_Data_${timestamp}_${rowCount}_Rows.xlsx`;
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        hidePopup();
+        showMessage(`Excel export completed! ${rowCount} rows exported ✅`, "success");
+      } catch (error) {
+        console.error("Export error:", error);
+        hidePopup();
+        showMessage("Export failed: " + error.message, "error");
+      }
     }
 
     // --- Individual Vendor Modal (two-list) logic ---
@@ -702,7 +851,7 @@
             tdVendor.appendChild(container);
           }
 
-          updateStamp(tableData);
+          updateStamp(filteredData);
           showPopup("Done ✅");
           setTimeout(() => hidePopup(), 1200);
           showMessage("Vendors saved & extracted ✅", "success");
@@ -1105,13 +1254,13 @@
           await new Promise(resolve => setTimeout(resolve, 100));
         }
 
-        updateStamp(tableData);
+        updateStamp(filteredData);
         showPopup("Done ✅");
         setTimeout(() => hidePopup(), 1200);
         showMessage(`Vendors assigned to ${updates.length} rows ✅`, "success");
         
         // Refresh the table to show all changes
-        renderTable(tableData);
+        renderTable(filteredData);
         return true;
       } catch (err) {
         console.error("Bulk save error:", err);
@@ -1130,8 +1279,14 @@
 
     function filterTable() {
       const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
-      if (!q) { renderTable(tableData); updateStamp(tableData); return; }
-      const filtered = tableData.filter(row => {
+      if (!q) { 
+        filteredData = [...tableData]; 
+        renderTable(filteredData); 
+        updateStamp(filteredData); 
+        return; 
+      }
+      
+      filteredData = tableData.filter(row => {
         const nitNo = valueToString(row[4]).toLowerCase(),
           date = formatDate(row[5]).toLowerCase(),
           slNo = valueToString(row[6]).toLowerCase(),
@@ -1144,11 +1299,16 @@
           activityId.includes(q) || workName.includes(q) ||
           siteDetails.includes(q) || fund.includes(q));
       });
-      renderTable(filtered);
-      updateStamp(filtered);
+      renderTable(filteredData);
+      updateStamp(filteredData);
     }
 
-    function clearSearch() { document.getElementById("searchInput").value = ""; renderTable(tableData); updateStamp(tableData); }
+    function clearSearch() { 
+      document.getElementById("searchInput").value = ""; 
+      filteredData = [...tableData];
+      renderTable(filteredData); 
+      updateStamp(filteredData); 
+    }
 
     // Confirm modal actions
     document.getElementById("confirmYes").onclick = async () => {
@@ -1171,7 +1331,7 @@
             closeBulkVendorModal();
             
             // Refresh the table to show updated vendor assignments
-            renderTable(tableData);
+            renderTable(filteredData);
           }, 900);
         } else {
           saveBtn.innerHTML = `Save`;
@@ -1219,5 +1379,8 @@
     // initial load
     loadData();
   </script>
+  
+  <!-- Include SheetJS library for Excel export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
 </html>
