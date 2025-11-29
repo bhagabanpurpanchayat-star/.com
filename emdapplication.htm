@@ -110,17 +110,55 @@
       padding: 12px;
       border-radius: 8px;
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.1);
       color: white;
       width: 100%;
       font-size: 14px;
       transition: all 0.3s;
     }
     
+    /* Vendor dropdown specific styles */
+    #vendorSelect {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid var(--primary);
+      color: white;
+      font-weight: 500;
+      font-size: 15px;
+    }
+    
+    #vendorSelect option {
+      background: var(--card-bg);
+      color: white;
+      padding: 10px;
+    }
+    
+    #vendorSelect:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    #vendorSelect:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: var(--secondary);
+    }
+    
+    /* Make the selected value always visible */
+    #vendorSelect:valid {
+      background: rgba(52, 152, 219, 0.2);
+      border-color: var(--primary);
+    }
+    
     select:focus, input:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    select:hover, input:hover {
+      background: rgba(255, 255, 255, 0.12);
     }
     
     .row {
@@ -297,8 +335,9 @@
     }
     
     .signature {
-      margin-top: 40px;
-      text-align: left;
+      margin-top: 60px;
+      text-align: right;
+      padding-right: 20px;
     }
     
     .print-buttons {
@@ -454,7 +493,7 @@
         <label for="vendorSelect">Select Vendor</label>
         <div class="row">
           <div class="col">
-            <select id="vendorSelect">
+            <select id="vendorSelect" required>
               <option value="">-- Select a vendor --</option>
             </select>
           </div>
@@ -750,7 +789,7 @@
 
       const html = `
       <div class="letter">
-        <div style="overflow:hidden">
+        <div style="overflow:hidden; margin-top: 120px;">
           <div class="left-block">
             <p>To,<br>
             &nbsp;&nbsp;&nbsp;&nbsp;The Prodhan<br>
@@ -763,7 +802,7 @@
         </div>
         <div class="clear"></div>
         
-        <p><strong>Sub - "Prayer for Earnest Money (EMD)"</strong></p>
+        <p style="margin-top: 40px; text-align: center;"><strong>Sub - "Prayer for Earnest Money (EMD)"</strong></p>
         
         <p>Sir/Madam,</p>
         
@@ -780,7 +819,7 @@
               <th>NIT NO</th>
               <th>Date</th>
               <th>SL No</th>
-              <th style="text-align:right">Amount (Rs)</th>
+              <th style="text-align:center">Amount (Rs)</th>
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
